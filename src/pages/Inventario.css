@@ -1,0 +1,47 @@
+/* src/pages/Inventario.css */
+
+.inv-container {
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+  background: #fff;  /* Fondo blanco para el inventario */
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+}
+
+.inv-container h1 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.inv-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.inv-table th,
+.inv-table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.inv-table th {
+  background: #f0f0f0;
+  font-weight: 600;
+}
+
+.inv-table tr:hover {
+  background: #f9f9f9;
+}
+
+.inv-table .bajo td {
+  background: #fff5e5;
+}
+
+.inv-table .agotado td {
+  background: #ffe5e5;
+  color: #a00;
+  font-weight: bold;
+}

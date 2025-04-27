@@ -1,0 +1,88 @@
+/* src/pages/Alertas.css */
+
+.alertas-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .alertas-container h1 {
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 2rem;
+    color: #333;
+  }
+  
+  .alertas-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  /* Tarjeta de alerta común */
+  .alerta-card {
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 2px solid;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    animation: pulse 2s infinite alternate;
+    font-size: 1.1rem;
+    position: relative;
+  }
+  
+  /* Alertas negativas */
+  .alerta-negativa {
+    background-color: #ffe5e5;
+    border-color: #e74c3c;
+    color: #a00;
+  }
+  
+  /* Alertas positivas */
+  .alerta-positiva {
+    background-color: #e5ffe5;
+    border-color: #2ecc71;
+    color: #27ae60;
+  }
+  
+  /* Botón Atender */
+  .btn-atender {
+    position: absolute;
+    right: 1rem;
+    bottom: 1rem;
+    background-color: #0984e3;
+    color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: background-color 0.3s;
+  }
+  
+  .btn-atender:hover {
+    background-color: #74b9ff;
+  }
+  
+  /* Sin alertas */
+  .sin-alertas {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #555;
+    margin-top: 2rem;
+  }
+  
+  /* Animación de pulso */
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    }
+    100% {
+      transform: scale(1.02);
+      box-shadow: 0 0 16px rgba(0,0,0,0.2);
+    }
+  }
+  
