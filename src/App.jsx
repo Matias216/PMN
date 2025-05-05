@@ -5,6 +5,7 @@ import AdministrarInventario from './pages/AdministrarInventario';
 import Alertas from './pages/Alertas';
 import AsistenciaIA from './pages/AsistenciaIA';
 import './App.css';
+import Configuracion from "./pages/Configuracion";
 
 
 export default function App() {
@@ -54,6 +55,7 @@ export default function App() {
             <Route path="/administrar" element={<AdministrarInventario />} />
             <Route path="/alertas" element={<Alertas />} />
             <Route path="/ia" element={<AsistenciaIA />} />
+            <Route path="/configuracion" element={<Configuracion />} />
           </Routes>
         </main>
       </div>
