@@ -1,27 +1,79 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { auth, db } from "../firebaseConfig";
+import {
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+} from "firebase/firestore";
+import { signOut } from "firebase/auth";
 import "./Configuracion.css";
 
 const Configuracion = () => {
-  const [nombre, setNombre] = useState("Juan");
-  const [apellido, setApellido] = useState("Pérez");
-  const [usuario, setUsuario] = useState("usuario_demo");
-  const [email, setEmail] = useState("demo@ejemplo.com");
-  const [telefono, setTelefono] = useState("+54 123456789");
-  const [pais, setPais] = useState("Argentina");
+  const [nombre, setNombre] = useState("");
+  const [apellido, setApellido] = useState("");
+  const [usuario, setUsuario] = useState("");
+  const [email, setEmail] = useState("");
+  const [telefono, setTelefono] = useState("");
+  const [pais, setPais] = useState("");
   const [idioma, setIdioma] = useState("Español");
   const [imagen, setImagen] = useState(null);
   const [confirmMsg, setConfirmMsg] = useState("");
+  const [uid, setUid] = useState(null);
   const navigate = useNavigate();
 
-  const handleGuardar = () => {
-    setConfirmMsg("✅ Datos guardados correctamente");
-    setTimeout(() => setConfirmMsg(""), 3000);
+  // Cargar datos desde Firestore
+  useEffect(() => {
+    const user = auth.currentUser;
+    if (user) {
+      setUid(user.uid);
+      setEmail(user.email); // ya viene de Auth
+
+      const userRef = doc(db, "usuarios", user.uid);
+      getDoc(userRef).then((docSnap) => {
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          setNombre(data.nombre || "");
+          setApellido(data.apellido || "");
+          setUsuario(data.usuario || "");
+          setTelefono(data.telefono || "");
+          setPais(data.pais || "");
+          setIdioma(data.idioma || "Español");
+          setImagen(data.imagen || null);
+        }
+      });
+    }
+  }, []);
+
+  const handleGuardar = async () => {
+    if (!uid) return;
+
+    const userRef = doc(db, "usuarios", uid);
+    const newData = {
+      nombre,
+      apellido,
+      usuario,
+      email,
+      telefono,
+      pais,
+      idioma,
+      imagen,
+    };
+
+    try {
+      await setDoc(userRef, newData, { merge: true });
+      setConfirmMsg("✅ Datos guardados correctamente");
+      setTimeout(() => setConfirmMsg(""), 3000);
+    } catch (error) {
+      console.error("Error al guardar configuración:", error);
+      setConfirmMsg("❌ Error al guardar");
+    }
   };
 
-  const handleCerrarSesion = () => {
-    alert("Sesión cerrada correctamente");
-    navigate("/");
+  const handleCerrarSesion = async () => {
+    await signOut(auth);
+    navigate("/login");
   };
 
   const handleImagenChange = (e) => {
@@ -51,7 +103,7 @@ const Configuracion = () => {
         <input type="text" value={usuario} onChange={(e) => setUsuario(e.target.value)} />
 
         <label>Correo electrónico:</label>
-        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+        <input type="email" value={email} disabled />
 
         <label>Número telefónico:</label>
         <input type="tel" value={telefono} onChange={(e) => setTelefono(e.target.value)} />

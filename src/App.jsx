@@ -6,7 +6,8 @@ import Alertas from './pages/Alertas';
 import AsistenciaIA from './pages/AsistenciaIA';
 import './App.css';
 import Configuracion from "./pages/Configuracion";
-
+import Registro from "./pages/Registro";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 export default function App() {
   return (
@@ -43,20 +44,33 @@ export default function App() {
             </ul>
           </nav>
           <div className="user-icon">
-            <Link to="/configuracion">
-              ⚙️ <span className="link-text">Configuración</span>
-            </Link>
+              <Link to="/configuracion">
+                  ⚙ <span className="link-text">Configuración</span>
+              </Link>
           </div>
         </aside>
         <main className="content">
           <Routes>
-            <Route path="/" element={<Login />} />
-            <Route path="/inventario" element={<Inventario />} />
-            <Route path="/administrar" element={<AdministrarInventario />} />
-            <Route path="/alertas" element={<Alertas />} />
-            <Route path="/ia" element={<AsistenciaIA />} />
-            <Route path="/configuracion" element={<Configuracion />} />
-          </Routes>
+  <Route path="/" element={<Login />} />
+  <Route path="/registro" element={<Registro />} />
+
+  <Route path="/inventario" element={
+    <ProtectedRoute><Inventario /></ProtectedRoute>
+  } />
+  <Route path="/administrar" element={
+    <ProtectedRoute><AdministrarInventario /></ProtectedRoute>
+  } />
+  <Route path="/alertas" element={
+    <ProtectedRoute><Alertas /></ProtectedRoute>
+  } />
+  <Route path="/ia" element={
+    <ProtectedRoute><AsistenciaIA /></ProtectedRoute>
+  } />
+  <Route path="/configuracion" element={
+    <ProtectedRoute><Configuracion /></ProtectedRoute>
+  } />
+</Routes>
+
         </main>
       </div>
     </Router>

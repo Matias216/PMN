@@ -1,59 +1,65 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Importamos useNavigate
-import './Login.css';
+// src/pages/Login.jsx
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebaseConfig";
+import "./Login.css";
 
-export default function Login() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const navigate = useNavigate();  // Hook para la redirección
+const Login = () => {
+  const [email, setEmail] = useState("");
+  const [contrasena, setContrasena] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
+    setError("");
 
-    // Validación simple de los campos
-    if (!username || !password) {
-      setError('Por favor, ingresa usuario y contraseña');
-      return;
+    try {
+      await signInWithEmailAndPassword(auth, email, contrasena);
+      navigate("/inventario");
+    } catch (err) {
+      setError("Credenciales inválidas. Verifica tu correo y contraseña.");
     }
-
-    // Simulación de login (puedes agregar lógica de autenticación aquí)
-    console.log('Login realizado con:', username, password);
-    setError(''); // Limpiar error si el login es correcto
-
-    // Redirigir a Inventario después de login
-    navigate('/inventario'); // Redirección a Inventario
   };
 
   return (
     <div className="login-container">
-      <div className="login-form">
-        <h1>Iniciar sesión</h1>
-        <form onSubmit={handleLogin}>
-          <div className="input-group">
-            <label htmlFor="username">Usuario</label>
-            <input
-              type="text"
-              id="username"
-              placeholder="Ingresa tu usuario"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            />
-          </div>
-          <div className="input-group">
-            <label htmlFor="password">Contraseña</label>
-            <input
-              type="password"
-              id="password"
-              placeholder="Ingresa tu contraseña"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
-          <button type="submit" className="login-btn">Iniciar sesión</button>
-        </form>
-        {error && <div className="error-message">{error}</div>}
-      </div>
+      <form className="login-form" onSubmit={handleLogin}>
+        <h1>Iniciar Sesión</h1>
+
+        <div className="input-group">
+          <label>Email</label>
+          <input
+            type="email"
+            placeholder="correo@ejemplo.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </div>
+
+        <div className="input-group">
+          <label>Contraseña</label>
+          <input
+            type="password"
+            placeholder="Contraseña"
+            value={contrasena}
+            onChange={(e) => setContrasena(e.target.value)}
+            required
+          />
+        </div>
+
+        {error && <p className="error-message">{error}</p>}
+
+        <button type="submit" className="login-btn">Ingresar</button>
+        <p className="registro-link">
+  ¿No tienes una cuenta? <a href="/registro">Regístrate aquí</a>
+</p>
+
+      </form>
     </div>
   );
-}
+};
+
+export default Login;

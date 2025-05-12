@@ -1,62 +1,99 @@
-import React, { useState } from 'react';
-import './AdministrarInventario.css';
+// src/pages/AdministrarInventario.jsx
+import React, { useEffect, useState } from "react";
+import "./AdministrarInventario.css";
+import {
+  collection,
+  getDocs,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
+import { db } from "../firebaseConfig";
 
 export default function AdministrarInventario() {
   const [productos, setProductos] = useState([]);
-  const [nombre, setNombre] = useState('');
-  const [cantidad, setCantidad] = useState('');
-  const [editando, setEditando] = useState(null);
-  const [mensaje, setMensaje] = useState('');
+  const [nombre, setNombre] = useState("");
+  const [cantidad, setCantidad] = useState("");
+  const [editandoId, setEditandoId] = useState(null);
+  const [mensaje, setMensaje] = useState("");
+
+  const productosRef = collection(db, "productos");
 
   const calcularEstado = (cantidad) => {
-    if (cantidad === 0) return 'Agotado';
-    if (cantidad < 10) return 'Bajo';
-    return 'En stock';
+    if (cantidad === 0) return "Agotado";
+    if (cantidad < 10) return "Bajo";
+    return "En stock";
   };
 
-  const handleSubmit = (e) => {
+  const cargarProductos = async () => {
+    const snapshot = await getDocs(productosRef);
+    const data = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    setProductos(data);
+  };
+
+  useEffect(() => {
+    cargarProductos();
+  }, []);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!nombre.trim() || !cantidad.trim()) {
-      setMensaje('Por favor completa todos los campos.');
+      setMensaje("Por favor completa todos los campos.");
       return;
     }
 
-    if (editando !== null) {
-      const nuevosProductos = productos.map((producto) =>
-        producto.id === editando
-          ? { ...producto, nombre, cantidad: parseInt(cantidad), estado: calcularEstado(parseInt(cantidad)) }
-          : producto
-      );
-      setProductos(nuevosProductos);
-      setMensaje('Producto actualizado correctamente.');
-    } else {
-      const nuevoProducto = {
-        id: Date.now(),
-        nombre,
-        cantidad: parseInt(cantidad),
-        estado: calcularEstado(parseInt(cantidad))
-      };
-      setProductos([...productos, nuevoProducto]);
-      setMensaje('Producto agregado correctamente.');
-    }
+    const cantidadInt = parseInt(cantidad);
+    const nuevoEstado = calcularEstado(cantidadInt);
 
-    setNombre('');
-    setCantidad('');
-    setEditando(null);
+    try {
+      if (editandoId) {
+        const productoRef = doc(db, "productos", editandoId);
+        await updateDoc(productoRef, {
+          nombre,
+          cantidad: cantidadInt,
+          estado: nuevoEstado,
+        });
+        setMensaje("Producto actualizado correctamente.");
+      } else {
+        await addDoc(productosRef, {
+          nombre,
+          cantidad: cantidadInt,
+          estado: nuevoEstado,
+        });
+        setMensaje("Producto agregado correctamente.");
+      }
+
+      setNombre("");
+      setCantidad("");
+      setEditandoId(null);
+      cargarProductos();
+    } catch (error) {
+      console.error("Error al guardar:", error);
+      setMensaje("Ocurrió un error. Intenta nuevamente.");
+    }
   };
 
   const handleEditar = (producto) => {
     setNombre(producto.nombre);
     setCantidad(producto.cantidad);
-    setEditando(producto.id);
-    setMensaje('Editando producto...');
+    setEditandoId(producto.id);
+    setMensaje("Editando producto...");
   };
 
-  const handleEliminar = (id) => {
-    const nuevosProductos = productos.filter((producto) => producto.id !== id);
-    setProductos(nuevosProductos);
-    setMensaje('Producto eliminado correctamente.');
+  const handleEliminar = async (id) => {
+    try {
+      await deleteDoc(doc(db, "productos", id));
+      setMensaje("Producto eliminado correctamente.");
+      cargarProductos();
+    } catch (error) {
+      console.error("Error al eliminar:", error);
+      setMensaje("No se pudo eliminar.");
+    }
   };
 
   return (
@@ -85,7 +122,7 @@ export default function AdministrarInventario() {
           />
         </div>
         <button type="submit" className="admin-btn">
-          {editando !== null ? 'Actualizar Producto' : 'Agregar Producto'}
+          {editandoId ? "Actualizar Producto" : "Agregar Producto"}
         </button>
       </form>
 
@@ -107,9 +144,9 @@ export default function AdministrarInventario() {
               </tr>
             </thead>
             <tbody>
-              {productos.map((producto) => (
+              {productos.map((producto, index) => (
                 <tr key={producto.id}>
-                  <td>{producto.id}</td>
+                  <td>{index + 1}</td>
                   <td>{producto.nombre}</td>
                   <td>{producto.cantidad}</td>
                   <td>{producto.estado}</td>
@@ -119,14 +156,14 @@ export default function AdministrarInventario() {
                       onClick={() => handleEditar(producto)}
                       title="Editar"
                     >
-                      ✏️
+                      ✏
                     </button>
                     <button
                       className="btn-eliminar"
                       onClick={() => handleEliminar(producto.id)}
                       title="Eliminar"
                     >
-                      🗑️
+                      🗑
                     </button>
                   </td>
                 </tr>
